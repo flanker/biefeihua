@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>别废话 · biefeihua.cn</title>
+<meta name="description" content="别让 AI 在工作聊天和文档里写废话。先想清楚你到底要说什么，再说人话。">
+<meta property="og:title" content="别废话 · biefeihua.cn">
+<meta property="og:description" content="把 AI 生成的一大坨『正确的废话』甩进群里、塞进文档之前，先想清楚：你到底想说什么？">
+<meta name="theme-color" content="#f5f1e8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23f5f1e8'/%3E%3Ctext x='50' y='58' font-size='52' text-anchor='middle' font-family='serif' fill='%231c1b18'%3E话%3C/text%3E%3Cline x1='18' y1='80' x2='82' y2='22' stroke='%23c0392b' stroke-width='9' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --paper:#f5f1e8;
+    --paper-2:#efe8d8;
+    --ink:#1c1b18;
+    --ink-soft:#56524a;
+    --ink-faint:#8a857a;
+    --red:#b8392b;
+    --red-bright:#d24330;
+    --green:#2f7a4d;
+    --rule:rgba(184,57,43,.42);
+    --hair:rgba(28,27,24,.14);
+    --col:660px;
+    --serif:Georgia,"Times New Roman","Songti SC","Noto Serif CJK SC","Source Han Serif SC",STSong,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    --mono:"SF Mono","JetBrains Mono",Menlo,Consolas,"Courier New",monospace;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:18px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
+  /* paper grain */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+    mix-blend-mode:multiply;
+  }
+
+  /* language visibility */
+  html[data-lang="zh"] .en{display:none!important}
+  html[data-lang="en"] .zh{display:none!important}
+  html[data-lang="en"] body{font-size:17.5px}
+
+  .wrap{
+    position:relative;z-index:1;
+    max-width:calc(var(--col) + 120px);
+    margin:0 auto;
+    padding:0 28px 90px 92px;
+  }
+  /* red binding margin (notebook rule) */
+  .wrap::before{
+    content:"";position:absolute;top:0;bottom:0;left:60px;
+    border-left:1.5px solid var(--rule);
+    box-shadow:3px 0 0 -1.5px var(--rule);
+  }
+  @media(max-width:720px){
+    .wrap{padding:0 22px 70px 30px}
+    .wrap::before{left:14px;box-shadow:none}
+  }
+
+  /* ---- top bar ---- */
+  .topbar{
+    position:sticky;top:0;z-index:20;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 0 14px;
+    margin-bottom:8px;
+    background:linear-gradient(var(--paper) 72%,transparent);
+  }
+  .brand{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+  .brand b{color:var(--red);font-weight:700}
+  .langtoggle{display:flex;font-family:var(--mono);font-size:13px;border:1px solid var(--hair);border-radius:999px;overflow:hidden;background:rgba(255,255,255,.35)}
+  .langtoggle button{
+    appearance:none;border:0;background:transparent;cursor:pointer;
+    font:inherit;color:var(--ink-soft);padding:5px 13px;transition:.18s;
+  }
+  .langtoggle button:hover{color:var(--ink)}
+  html[data-lang="zh"] .langtoggle .b-zh,
+  html[data-lang="en"] .langtoggle .b-en{background:var(--ink);color:var(--paper)}
+
+  /* ---- section scaffolding ---- */
+  section{padding:54px 0;position:relative}
+  section + section{border-top:1px solid var(--hair)}
+  .marker{
+    font-family:var(--mono);font-size:12px;letter-spacing:.12em;
+    color:var(--red);margin-bottom:18px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .marker::after{content:"";flex:0 0 36px;height:1px;background:var(--rule)}
+  h2{font-family:var(--serif);font-weight:700;font-size:clamp(26px,5vw,38px);line-height:1.18;letter-spacing:-.01em;margin-bottom:20px}
+  p{max-width:var(--col)}
+  .lead{color:var(--ink-soft);font-size:1.05rem}
+
+  /* ---- hero ---- */
+  .hero{padding-top:34px;padding-bottom:48px}
+  .kicker{font-family:var(--mono);font-size:12.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:26px}
+  .hero h1{
+    font-family:var(--serif);font-weight:700;
+    font-size:clamp(54px,15vw,118px);
+    line-height:.94;letter-spacing:-.02em;
+    margin-bottom:30px;
+  }
+  .hero h1 .line{display:block}
+  .hero h1 .stop{color:var(--red);position:relative;white-space:nowrap}
+  /* hand strike on the headline accent */
+  .hero h1 .stop::after{
+    content:"";position:absolute;left:-2%;right:-2%;top:54%;height:.1em;min-height:5px;
+    background:var(--red-bright);transform:rotate(-1.6deg);transform-origin:left;
+    border-radius:3px;animation:strike 1s .55s cubic-bezier(.6,.1,.2,1) backwards;
+  }
+  @keyframes strike{from{transform:rotate(-1.6deg) scaleX(0)}to{transform:rotate(-1.6deg) scaleX(1)}}
+  .hero .sub{font-size:clamp(1.05rem,2.6vw,1.35rem);color:var(--ink-soft);line-height:1.55;max-width:600px}
+  .hero .en h1{font-size:clamp(40px,10vw,84px);line-height:1.0}
+
+  .reveal{opacity:0;transform:translateY(16px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  .d1{transition-delay:.05s}.d2{transition-delay:.13s}.d3{transition-delay:.21s}.d4{transition-delay:.29s}
+
+  /* ---- definition emphasis ---- */
+  .define{font-family:var(--serif);font-size:clamp(20px,3.4vw,27px);line-height:1.5;color:var(--ink)}
+  .define em{font-style:normal;color:var(--red);font-weight:700}
+  .define .quoted{color:var(--ink-soft)}
+
+  /* ---- compare cards ---- */
+  .compare{display:grid;gap:22px;margin-top:8px}
+  @media(min-width:760px){.compare{grid-template-columns:1fr 1fr;gap:26px;align-items:start}}
+  .card{
+    position:relative;background:#fffdf8;
+    border:1px solid var(--hair);
+    border-radius:4px;padding:22px 22px 24px;
+    box-shadow:0 1px 0 rgba(28,27,24,.04),0 14px 30px -22px rgba(28,27,24,.5);
+  }
+  .card.bad{transform:rotate(-.5deg)}
+  .card.good{transform:rotate(.4deg)}
+  .card .tag{
+    position:absolute;top:-13px;right:14px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.12em;font-weight:700;
+    padding:4px 10px;border-radius:3px;text-transform:uppercase;
+  }
+  .card.bad .tag{color:#fff;background:var(--red);transform:rotate(2deg);box-shadow:0 4px 10px -4px var(--red)}
+  .card.good .tag{color:#fff;background:var(--green);transform:rotate(-2deg);box-shadow:0 4px 10px -4px var(--green)}
+  .card .cap{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--ink-faint);text-transform:uppercase;margin-bottom:14px}
+
+  /* chat bubbles */
+  .chat{display:flex;flex-direction:column;gap:9px}
+  .who{font-size:12px;color:var(--ink-faint);margin-bottom:-3px}
+  .bubble{background:var(--paper-2);border-radius:4px 14px 14px 14px;padding:11px 14px;font-size:15px;line-height:1.55;max-width:96%}
+  .card.good .bubble{background:#e3f0e6;border-radius:14px 4px 14px 14px;align-self:flex-end;color:#16341f}
+  .bubble .time{display:block;font-size:10.5px;color:var(--ink-faint);margin-top:6px;text-align:right}
+
+  /* doc snippet */
+  .doc{font-size:15px;line-height:1.62}
+  .doc .docttl{font-family:var(--serif);font-weight:700;font-size:17px;border-bottom:1px solid var(--hair);padding-bottom:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline}
+  .doc .docttl small{font-family:var(--mono);font-size:10px;color:var(--ink-faint);letter-spacing:.08em;font-weight:400}
+
+  /* red-pen strike on cliché phrases */
+  s.mark{
+    text-decoration:none;position:relative;color:var(--ink-soft);
+    background:linear-gradient(var(--red-bright),var(--red-bright)) left center/100% 2px no-repeat;
+    background-position:center 58%;
+    padding:0 1px;
+  }
+  s.mark{text-decoration:line-through;text-decoration-color:var(--red-bright);text-decoration-thickness:2px}
+  .card.bad .note{
+    display:inline-block;font-family:var(--serif);font-style:italic;color:var(--red);
+    font-size:13px;margin-top:14px;border-top:1px dashed var(--rule);padding-top:10px;
+  }
+  .card.good .cleanline{color:var(--green);font-family:var(--mono);font-size:12px;margin-top:12px}
+
+  /* ---- punch lines ---- */
+  .punch{list-style:none;display:flex;flex-direction:column;gap:26px;counter-reset:p}
+  .punch li{
+    position:relative;padding-left:46px;
+    font-family:var(--serif);font-size:clamp(19px,3.2vw,25px);line-height:1.42;
+  }
+  .punch li::before{
+    counter-increment:p;content:"#" counter(p);
+    position:absolute;left:0;top:.18em;
+    font-family:var(--mono);font-size:13px;color:var(--red);font-weight:700;
+  }
+  .quote{margin-top:40px;padding:20px 0 4px 26px;border-left:3px solid var(--rule)}
+  .quote q{font-family:var(--serif);font-style:italic;font-size:clamp(18px,3vw,23px);quotes:none;color:var(--ink)}
+  .quote .cite{display:block;margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--ink-faint);letter-spacing:.06em}
+
+  /* ---- tools ---- */
+  .rules{list-style:none;display:grid;gap:16px;margin-bottom:40px}
+  @media(min-width:680px){.rules{grid-template-columns:repeat(3,1fr)}}
+  .rules li{background:#fffdf8;border:1px solid var(--hair);border-radius:4px;padding:18px;position:relative}
+  .rules li .n{font-family:var(--serif);font-size:34px;font-weight:700;color:var(--red);line-height:1;display:block;margin-bottom:10px}
+  .rules li p{font-size:15.5px;line-height:1.45;color:var(--ink)}
+
+  .promptbox{background:var(--ink);color:#f0ece1;border-radius:6px;padding:20px 20px 16px;position:relative;margin-bottom:36px;box-shadow:0 18px 40px -28px #000}
+  .promptbox .ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .promptbox .ph span{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#b9b09a}
+  .promptbox .ptxt{font-family:var(--mono);font-size:14.5px;line-height:1.62;color:#f4efe2}
+  .copybtn{appearance:none;border:1px solid rgba(255,255,255,.25);background:transparent;color:#f0ece1;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;border-radius:4px;cursor:pointer;transition:.18s;white-space:nowrap}
+  .copybtn:hover{background:rgba(255,255,255,.12)}
+  .copybtn.done{background:var(--green);border-color:var(--green);color:#fff}
+
+  .check{list-style:none;display:grid;gap:12px}
+  .check li{display:flex;gap:13px;align-items:flex-start;font-size:16px;line-height:1.45}
+  .check li::before{content:"";flex:0 0 20px;height:20px;margin-top:2px;border:2px solid var(--ink);border-radius:4px;background:linear-gradient(135deg,transparent 46%,var(--green) 46% 54%,transparent 54%),linear-gradient(45deg,transparent 46%,var(--green) 46% 54%,transparent 54%);background-size:0 0;transition:background-size .2s}
+  .check li{cursor:default}
+
+  /* ---- CTA / footer ---- */
+  .cta{text-align:left;padding-top:60px}
+  .cta h2{margin-bottom:24px}
+  .ctarow{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  .bigbtn{
+    appearance:none;border:0;cursor:pointer;font:inherit;font-weight:600;
+    background:var(--red);color:#fff;font-size:16px;padding:14px 26px;border-radius:999px;
+    box-shadow:0 12px 26px -14px var(--red);transition:.18s;display:inline-flex;gap:9px;align-items:center;
+  }
+  .bigbtn:hover{transform:translateY(-2px);background:var(--red-bright)}
+  .bigbtn.done{background:var(--green);box-shadow:0 12px 26px -14px var(--green)}
+  .urlpill{font-family:var(--mono);font-size:13px;color:var(--ink-soft);border:1px dashed var(--hair);padding:11px 16px;border-radius:999px}
+
+  footer{margin-top:66px;padding-top:26px;border-top:1px solid var(--hair);display:flex;flex-wrap:wrap;gap:16px 28px;justify-content:space-between;align-items:center;font-size:13px;color:var(--ink-faint)}
+  footer a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--rule)}
+  footer a:hover{color:var(--red)}
+  footer .credit{max-width:380px;line-height:1.6}
+
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+  @media (prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none;transition:none}
+    .hero h1 .stop::after{animation:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="topbar">
+    <div class="brand"><b>别废话</b> · biefeihua.cn</div>
+    <div class="langtoggle" role="group" aria-label="Language">
+      <button class="b-zh" type="button" data-set="zh">中</button>
+      <button class="b-en" type="button" data-set="en">EN</button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="kicker reveal d1">
+      <span class="zh">一个职场反废话宣言</span>
+      <span class="en">A WORKPLACE ANTI-FLUFF MANIFESTO</span>
+    </div>
+    <h1>
+      <span class="zh reveal d2"><span class="line">别废话<span class="stop">。</span></span><span class="line">说人话<span class="stop">。</span></span></span>
+      <span class="en reveal d2"><span class="line">Cut the fluff<span class="stop">.</span></span><span class="line">Talk like<br>a human<span class="stop">.</span></span></span>
+    </h1>
+    <p class="sub reveal d3">
+      <span class="zh">把 AI 生成的一大坨「正确的废话」甩进群里、塞进文档之前，先想清楚：你到底想说什么？</span>
+      <span class="en">Before you paste a wall of AI-generated "technically-correct nothing" into a chat or a doc — figure out what you're actually trying to say.</span>
+    </p>
+  </section>
+
+  <!-- 01 DEFINITION -->
+  <section>
+    <div class="marker reveal"><span class="zh">01 / 什么是「废话」</span><span class="en">01 / WHAT IS FLUFF</span></div>
+    <p class="define reveal">
+      <span class="zh"><em>废话 = 字数很多，信息很少。</em>读起来像在说什么，其实什么都没说。AI 最擅长这个：四平八稳的排比、<span class="quoted">滴水不漏的「综上所述」</span>、永远正确的「为了更好地推进工作」。</span>
+      <span class="en"><em>Fluff = lots of words, little information.</em> It sounds like it's saying something, but it isn't. AI is great at exactly this: tidy parallel structures, <span class="quoted">airtight "in summary"s</span>, the forever-true "in order to better drive the work forward."</span>
+    </p>
+  </section>
+
+  <!-- 02 IM -->
+  <section>
+    <div class="marker reveal"><span class="zh">02 / 群里聊天</span><span class="en">02 / IN THE CHAT</span></div>
+    <h2 class="reveal"><span class="zh">别拿 AI 长篇大论淹没对话。</span><span class="en">Don't drown the chat in AI essays.</span></h2>
+    <div class="compare">
+      <div class="card bad reveal d1">
+        <span class="tag zh">别这样</span><span class="tag en">DON'T</span>
+        <div class="cap zh">同事问：用方案 A 还是 B？</div><div class="cap en">Asked: Option A or B?</div>
+        <div class="chat">
+          <span class="who zh">小王 14:32</span><span class="who en">Wang · 14:32</span>
+          <div class="bubble">
+            <span class="zh"><b>关于是否采用方案 A 的综合分析与建议</b><br><s class="mark">综合考虑各方面因素</s>，在<s class="mark">当前形势下</s>，为更好地<s class="mark">赋能业务、推动落地</s>，现就方案选型作如下说明：首先，方案 A 与方案 B 各有侧重，<s class="mark">均具有重要意义</s>；其次，需要<s class="mark">统筹兼顾、多维评估</s>；<s class="mark">综上所述</s>，建议结合实际<s class="mark">审慎研判后稳妥推进</s>……
+            <span class="time">还有 4 段 ▾</span></span>
+            <span class="en"><b>A Comprehensive Analysis and Recommendation on Whether to Adopt Option A</b><br><s class="mark">Taking all factors into consideration</s>, under the <s class="mark">current circumstances</s>, in order to better <s class="mark">empower the business and drive execution</s>, here is the explanation: first, both options <s class="mark">have their merits and great significance</s>; second, we must <s class="mark">balance and evaluate across multiple dimensions</s>; <s class="mark">in summary</s>, it is advised to <s class="mark">prudently proceed after careful deliberation</s>…
+            <span class="time">4 more paragraphs ▾</span></span>
+          </div>
+        </div>
+        <span class="note zh">↑ 6 段话，没有结论。读完还是不知道选哪个。</span>
+        <span class="note en">↑ Six paragraphs, no answer. Still don't know which one.</span>
+      </div>
+      <div class="card good reveal d2">
+        <span class="tag zh">这样说</span><span class="tag en">DO</span>
+        <div class="cap zh">同事问：用方案 A 还是 B？</div><div class="cap en">Asked: Option A or B?</div>
+        <div class="chat">
+          <span class="who zh">小王 14:32</span><span class="who en">Wang · 14:32</span>
+          <div class="bubble">
+            <span class="zh">建议用方案 A：成本低 30%，两周能上线。要看对比表吗？</span>
+            <span class="en">Go with Option A: 30% cheaper, ships in two weeks. Want the comparison table?</span>
+          </div>
+        </div>
+        <span class="cleanline zh">结论 · 理由 · 下一步。三句话。</span>
+        <span class="cleanline en">Answer · reason · next step. Three lines.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 DOC -->
+  <section>
+    <div class="marker reveal"><span class="zh">03 / 工作文档</span><span class="en">03 / IN THE DOC</span></div>
+    <h2 class="reveal"><span class="zh">立项书不是字数比赛。</span><span class="en">A proposal isn't a word-count contest.</span></h2>
+    <div class="compare">
+      <div class="card bad reveal d1">
+        <span class="tag zh">别这样</span><span class="tag en">DON'T</span>
+        <div class="doc">
+          <div class="docttl"><span class="zh">项目立项书</span><span class="en">Project Proposal</span><small>v1 · 1280 字</small></div>
+          <p class="zh"><s class="mark">在当今数字化转型的大背景下</s>，为更好地<s class="mark">响应公司战略、提升业务效能</s>，经过<s class="mark">综合研判与充分论证</s>，本项目<s class="mark">应运而生</s>。项目将<s class="mark">坚持问题导向、结果导向</s>，<s class="mark">全面统筹、系统推进</s>，<s class="mark">努力开创工作新局面</s>……</p>
+          <p class="en"><s class="mark">Against the grand backdrop of today's digital transformation</s>, in order to better <s class="mark">respond to company strategy and improve operational efficiency</s>, after <s class="mark">comprehensive deliberation</s>, this project <s class="mark">came into being</s>. It will <s class="mark">stay problem-oriented and results-oriented</s>, <s class="mark">coordinate holistically</s>, and <s class="mark">strive to open a new chapter</s>…</p>
+        </div>
+        <span class="note zh">↑ 读完第一段，还不知道这项目要干嘛。</span>
+        <span class="note en">↑ One paragraph in, still no idea what it does.</span>
+      </div>
+      <div class="card good reveal d2">
+        <span class="tag zh">这样写</span><span class="tag en">DO</span>
+        <div class="doc">
+          <div class="docttl"><span class="zh">项目立项书</span><span class="en">Project Proposal</span><small>v1 · 1 句话</small></div>
+          <p class="zh">这个项目解决一个问题：客服每天手动导报表要花 2 小时。我们做自动化，把这 2 小时还回去。</p>
+          <p class="en">This project fixes one thing: support reps spend 2 hours a day exporting reports by hand. We automate it and give those 2 hours back.</p>
+        </div>
+        <span class="cleanline zh">一句话讲清：问题 → 方案 → 收益。</span>
+        <span class="cleanline en">One line: problem → fix → payoff.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 WHY -->
+  <section>
+    <div class="marker reveal"><span class="zh">04 / 废话为什么有害</span><span class="en">04 / WHY IT'S A PROBLEM</span></div>
+    <ul class="punch">
+      <li class="reveal"><span class="zh">废话稀释信息——每多一句空话，真正重要的那句就更难被看见。</span><span class="en">Fluff dilutes signal — every empty sentence makes the one that matters harder to find.</span></li>
+      <li class="reveal"><span class="zh">你省下的那 5 分钟，是让 10 个读者各花 5 分钟替你解码。</span><span class="en">The 5 minutes you saved? You spent them for 10 readers, each decoding your mess for 5.</span></li>
+      <li class="reveal"><span class="zh">AI 不会替你想清楚，它只会把你没想清楚的东西，包装得像想清楚了。</span><span class="en">AI won't think it through for you. It just makes what you haven't thought through look like you have.</span></li>
+    </ul>
+    <div class="quote reveal">
+      <q class="zh">信息越来越多，意义越来越少。</q>
+      <q class="en">We live in a world where there is more and more information, and less and less meaning.</q>
+      <span class="cite zh">—— 让·鲍德里亚</span><span class="cite en">— Jean Baudrillard</span>
+    </div>
+  </section>
+
+  <!-- 05 HOW -->
+  <section>
+    <div class="marker reveal"><span class="zh">05 / 怎么办</span><span class="en">05 / WHAT TO DO</span></div>
+    <h2 class="reveal"><span class="zh">三条原则 + 一段 Prompt + 一张清单。</span><span class="en">Three rules, one prompt, one checklist.</span></h2>
+
+    <ul class="rules reveal d1">
+      <li><span class="n">1</span><p class="zh">先结论，后理由。</p><p class="en">Conclusion first, reasons after.</p></li>
+      <li><span class="n">2</span><p class="zh">删到不能再删，意思还在。</p><p class="en">Cut until you can't cut more and the meaning's still there.</p></li>
+      <li><span class="n">3</span><p class="zh">让 AI 帮你想，别让它帮你凑字数。</p><p class="en">Let AI help you think, not pad your word count.</p></li>
+    </ul>
+
+    <div class="promptbox reveal d2">
+      <div class="ph">
+        <span class="zh">喂给 AI 的反废话 Prompt</span><span class="en">ANTI-FLUFF PROMPT FOR YOUR AI</span>
+        <button class="copybtn" id="copyPrompt" type="button">
+          <span class="zh">复制</span><span class="en">Copy</span>
+        </button>
+      </div>
+      <p class="ptxt zh" data-prompt-zh>直接给结论，用最少的字。不要排比、不要「综上所述」、不要「为了更好地」这类套话。信息不够就直接问我，不要编。</p>
+      <p class="ptxt en" data-prompt-en>Give me the conclusion directly, in as few words as possible. No parallel structures, no "in summary," no "in order to better." If you don't have enough info, just ask — don't make it up.</p>
+    </div>
+
+    <div class="marker" style="margin-bottom:14px"><span class="zh">发出去前问自己</span><span class="en">BEFORE YOU HIT SEND</span></div>
+    <ul class="check reveal d3">
+      <li><span class="zh">结论在第一句吗？</span><span class="en">Is the conclusion in the first line?</span></li>
+      <li><span class="zh">删掉一半字，意思还在吗？</span><span class="en">Cut half the words — does it still mean the same?</span></li>
+      <li><span class="zh">有没有「说了等于没说」的话？</span><span class="en">Any "says-nothing" sentences?</span></li>
+      <li><span class="zh">收件人 5 秒内能 get 到重点吗？</span><span class="en">Can the reader get the point in 5 seconds?</span></li>
+    </ul>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <h2 class="reveal"><span class="zh">看到有人往群里、文档里发废话？</span><span class="en">Caught someone lobbing AI slop into a chat or a doc?</span></h2>
+    <p class="lead reveal" style="margin-bottom:26px"><span class="zh">别忍着。把这页甩给他。</span><span class="en">Don't suffer in silence. Send them this page.</span></p>
+    <div class="ctarow reveal d1">
+      <button class="bigbtn" id="copyLink" type="button">
+        <span class="zh">复制链接</span><span class="en">Copy link</span>
+      </button>
+      <span class="urlpill">biefeihua.cn</span>
+    </div>
+  </section>
+
+  <footer>
+    <div class="credit">
+      <span class="zh">灵感来自 <a href="https://nohello.net" target="_blank" rel="noopener">nohello.net</a> 与 <a href="https://noslopgrenade.com" target="_blank" rel="noopener">noslopgrenade.com</a>。</span>
+      <span class="en">Inspired by <a href="https://nohello.net" target="_blank" rel="noopener">nohello.net</a> &amp; <a href="https://noslopgrenade.com" target="_blank" rel="noopener">noslopgrenade.com</a>.</span>
+    </div>
+    <div>biefeihua.cn</div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var html=document.documentElement;
+
+  // ---- language ----
+  function setLang(l,store){
+    if(l!=='en') l='zh';
+    html.setAttribute('data-lang',l);
+    html.setAttribute('lang', l==='en'?'en':'zh-CN');
+    if(store){
+      try{localStorage.setItem('biefeihua-lang',l);}catch(e){}
+      if(history.replaceState) history.replaceState(null,'','#'+l);
+      else location.hash=l;
+    }
+  }
+  var initial='zh';
+  var h=(location.hash||'').replace('#','').toLowerCase();
+  if(h==='en'||h==='zh') initial=h;
+  else{ try{var s=localStorage.getItem('biefeihua-lang'); if(s) initial=s;}catch(e){} }
+  setLang(initial,false);
+
+  document.querySelectorAll('.langtoggle button').forEach(function(b){
+    b.addEventListener('click',function(){setLang(b.getAttribute('data-set'),true);});
+  });
+
+  // ---- copy helpers ----
+  function legacyCopy(text){
+    return new Promise(function(res,rej){
+      try{
+        var t=document.createElement('textarea');
+        t.value=text;t.style.position='fixed';t.style.top='-9999px';t.style.opacity='0';
+        document.body.appendChild(t);t.focus();t.select();
+        var ok=document.execCommand('copy');document.body.removeChild(t);
+        ok?res():rej(new Error('execCommand failed'));
+      }catch(e){rej(e);}
+    });
+  }
+  function copy(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      // fall back to execCommand if the async API is blocked (e.g. file://)
+      return navigator.clipboard.writeText(text).catch(function(){return legacyCopy(text);});
+    }
+    return legacyCopy(text);
+  }
+  function flash(btn){
+    btn.classList.add('done');
+    var sp=btn.querySelectorAll('span');
+    var prev=[];
+    sp.forEach(function(s){prev.push(s.textContent);});
+    sp.forEach(function(s){
+      s.textContent = s.classList.contains('en') ? 'Copied ✓' : '已复制 ✓';
+    });
+    setTimeout(function(){
+      btn.classList.remove('done');
+      sp.forEach(function(s,i){s.textContent=prev[i];});
+    },1600);
+  }
+
+  var cp=document.getElementById('copyPrompt');
+  cp.addEventListener('click',function(){
+    var lang=html.getAttribute('data-lang');
+    var el=document.querySelector('[data-prompt-'+lang+']');
+    copy(el.textContent.trim()).then(function(){flash(cp);});
+  });
+
+  var cl=document.getElementById('copyLink');
+  cl.addEventListener('click',function(){
+    var lang=html.getAttribute('data-lang');
+    var url=location.origin+location.pathname+'#'+lang;
+    if(location.protocol==='file:') url='https://biefeihua.cn/#'+lang;
+    copy(url).then(function(){flash(cl);});
+  });
+
+  // ---- reveal on scroll ----
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var items=document.querySelectorAll('.reveal');
+  if(reduce||!('IntersectionObserver'in window)){
+    items.forEach(function(el){el.classList.add('in');});
+  }else{
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+    },{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+    items.forEach(function(el){io.observe(el);});
+  }
+})();
+</script>
+</body>
+</html>
